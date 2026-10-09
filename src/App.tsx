@@ -1,35 +1,84 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import Card, { CardBody } from "./components/Card";
+import List from "./components/List";
+import Button from "./components/Button";
 
 function App() {
-  const [count, setCount] = useState(0)
+  // 1. ESTADOS (State)
+  // Estado para la lista dinámica de elementos
+  const [data, setData] = useState<string[]>(["Homero", "Marge", "Bart"]);
 
+  // Estado para el contador de selecciones realizadas en la lista
+  const [totalSelecciones, setTotalSelecciones] = useState<number>(0);
+
+  // Estado para simular la carga en el botón de "Ver"
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // 2. MANEJADORES DE EVENTOS (Handlers)
+
+  // Agrega un nuevo elemento al arreglo manteniendo la inmutabilidad
+  const addMinion = () => {
+    setData([...data, "Minion"]);
+  };
+
+  // Elimina el último elemento del arreglo sin mutar el estado original
+  const deleteMinion = () => {
+    setData(data.slice(0, -1));
+  };
+
+  // Incrementa el contador cuando el hijo (List) emite el evento 'onSelect'
+  const handleSelect = (elemento: string) => {
+    console.log(`Seleccionado: ${elemento}`);
+    setTotalSelecciones(totalSelecciones + 1);
+  };
+
+  // Acción cuando el cursor pasa sobre un elemento de la lista
+  const handleOver = (elemento: string) => {
+    console.log(`El mouse está sobre: ${elemento}`);
+  };
+
+  // Alterna el estado de carga del botón "Ver"
+  const handleClick = () => {
+    setIsLoading(!isLoading);
+  };
+
+  // 3. RENDERIZADO CONDICIONAL POR VARIABLE
+  // Evalúa si hay elementos en el arreglo usando el comportamiento Truthy/Falsy de JS
+  const contenido = data.length ? (
+    <List data={data} onSelect={handleSelect} onHover={handleOver} />
+  ) : (
+    <p className="text-muted">No hay elementos para mostrar</p>
+  );
+
+  // 4. ESTRUCTURA JSX
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="container mt-4">
+      <Card>
+        <CardBody
+          titulo="Gestión de Lista"
+          texto="Añade o elimina elementos de la lista dinámica"
+        />
+
+        {/* Acciones para modificar el estado dinámico */}
+        <div className="d-flex gap-2 my-2">
+          <Button onClick={addMinion}>Agregar</Button>
+          <Button onClick={deleteMinion}>Eliminar</Button>
+        </div>
+
+        {/* Renderizado condicional de la lista */}
+        {contenido}
+
+        {/* Botón secundario con estado de carga */}
+        <div className="mt-3">
+          <Button isLoading={isLoading} onClick={handleClick}>
+            Ver
+          </Button>
+        </div>
+
+        <h4 className="mt-2">Veces presionado: {totalSelecciones}</h4>
+      </Card>
+    </div>
+  );
 }
 
-export default App
+export default App;
